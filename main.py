@@ -8,15 +8,15 @@ main_turtle.py - 8 klickbare Bits mit turtle (kein pygame)
 - Start: python main_turtle.py
 """
 import turtle
+import random
 
 # --- Konfiguration ---
 N_BITS = 8
-WINDOW_W, WINDOW_H = 1200, 420
+WINDOW_W, WINDOW_H = 1200, 900
 TITLE_Y = 160
 DIGIT_Y = 0
 DIGIT_FONT = ("Arial", 72, "bold")    # große Ziffern
 TITLE_FONT = ("Arial", 36, "bold")
-STUMP_LEN = 18
 STUMP_WIDTH = 6
 DIGIT_HIT_W = 110    # Hitbox-Breite um die Ziffer
 DIGIT_HIT_H = 120    # Hitbox-Höhe um die Ziffer
@@ -80,7 +80,18 @@ def draw_all():
         drawer.pencolor(STUMP_COLOR)
         drawer.goto(stump_x, stump_y_top)
         drawer.pendown()
-        drawer.goto(stump_x, stump_y_top - STUMP_LEN)
+        totalHeight = WINDOW_H/-2
+        randomInt1 = random.randint(-40, 40)
+        randomInt2 = random.randint(-40, 40)
+        drawer.goto(stump_x, totalHeight / 10 * 2)
+        drawer.goto(stump_x + randomInt1, totalHeight / 10 * 3)
+        drawer.goto(stump_x + randomInt1, totalHeight / 10 * 4)
+        drawer.goto(stump_x, totalHeight / 10 * 5)
+        drawer.goto(stump_x, totalHeight / 10 * 6)
+        drawer.goto(stump_x + randomInt2, totalHeight / 10 * 7)
+        drawer.goto(stump_x + randomInt2, totalHeight / 10 * 8)
+        drawer.goto(stump_x, totalHeight / 10 * 9)
+        drawer.goto(stump_x, totalHeight / 10 * 10)
         drawer.penup()
         drawer.pensize(1)
 
