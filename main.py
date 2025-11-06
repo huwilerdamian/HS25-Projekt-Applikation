@@ -17,12 +17,13 @@ TITLE_Y = 160
 DIGIT_Y = 0
 DIGIT_FONT = ("Arial", 72, "bold")    # große Ziffern
 TITLE_FONT = ("Arial", 36, "bold")
-STUMP_WIDTH = 6
+STUMP_WIDTH = 14
 DIGIT_HIT_W = 110    # Hitbox-Breite um die Ziffer
 DIGIT_HIT_H = 120    # Hitbox-Höhe um die Ziffer
-BG_COLOR = "white"
-DIGIT_COLOR = "black"
-STUMP_COLOR = "black"
+BG_COLOR = "black"
+DIGIT_COLOR = "white"
+STUMP_COLOR_ACTIVE = "#fca139"
+STUMP_COLOR_INACTIVE = "#a68046"
 
 # --- Setup ---
 screen = turtle.Screen()
@@ -30,6 +31,7 @@ screen.setup(WINDOW_W, WINDOW_H)
 screen.title("Bits - Klick zum Umschalten")
 screen.bgcolor(BG_COLOR)
 screen.tracer(0)  # manuelles update für sauberes Redraw
+screen.bgpic("files/img/background.png")
 
 drawer = turtle.Turtle(visible=False)
 drawer.penup()
@@ -75,7 +77,10 @@ def draw_all():
         y = DIGIT_Y
         # Ziffer
         drawer.goto(x, y - (DIGIT_FONT[1] // 3))  # leicht zentriert, weil write an der Basis ausrichtet
-        drawer.pencolor(DIGIT_COLOR)
+        if bits[i] == 1:
+            drawer.pencolor(STUMP_COLOR_ACTIVE)
+        else:
+            drawer.pencolor(STUMP_COLOR_INACTIVE)
         drawer.write(str(bits[i]), align="center", font=DIGIT_FONT)
 
         # Stummel unter der Ziffer
@@ -83,7 +88,6 @@ def draw_all():
         # stump_y_top: etwas unterhalb der Ziffer; experimentell abgeschätzt
         stump_y_top = y - (DIGIT_FONT[1] // 1.6)
         drawer.pensize(STUMP_WIDTH)
-        drawer.pencolor(STUMP_COLOR)
         drawer.goto(stump_x, stump_y_top)
         drawer.pendown()
         totalHeight = WINDOW_H/-2
