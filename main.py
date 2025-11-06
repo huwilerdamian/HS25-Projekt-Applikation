@@ -35,8 +35,11 @@ drawer = turtle.Turtle(visible=False)
 drawer.penup()
 drawer.speed(0)
 
-randomInt1 = random.randint(-40, 40)
-randomInt2 = random.randint(-40, 40)
+random_pairs = []
+for i in range(N_BITS):
+    randomInt1 = random.randint(-40, 40)
+    randomInt2 = random.randint(-40, 40)
+    random_pairs.append((randomInt1, randomInt2))
 
 # initial bits (alle 0)
 bits = [0] * N_BITS
@@ -86,12 +89,12 @@ def draw_all():
         totalHeight = WINDOW_H/-2
         # zufällig Linien zeichnen
         drawer.goto(stump_x, totalHeight / 10 * 2)
-        drawer.goto(stump_x + randomInt1, totalHeight / 10 * 3)
-        drawer.goto(stump_x + randomInt1, totalHeight / 10 * 4)
+        drawer.goto(stump_x + random_pairs[i][0], totalHeight / 10 * 3)
+        drawer.goto(stump_x + random_pairs[i][0], totalHeight / 10 * 4)
         drawer.goto(stump_x, totalHeight / 10 * 5)
         drawer.goto(stump_x, totalHeight / 10 * 6)
-        drawer.goto(stump_x + randomInt2, totalHeight / 10 * 7)
-        drawer.goto(stump_x + randomInt2, totalHeight / 10 * 8)
+        drawer.goto(stump_x + random_pairs[i][1], totalHeight / 10 * 7)
+        drawer.goto(stump_x + random_pairs[i][1], totalHeight / 10 * 8)
         drawer.goto(stump_x, totalHeight / 10 * 9)
         drawer.goto(stump_x, totalHeight / 10 * 10)
         drawer.penup()
