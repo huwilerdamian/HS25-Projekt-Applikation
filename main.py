@@ -81,6 +81,7 @@ def draw_all():
         drawer.goto(stump_x, stump_y_top)
         drawer.pendown()
         totalHeight = WINDOW_H/-2
+        # zufällig Linien zeichnen
         randomInt1 = random.randint(-40, 40)
         randomInt2 = random.randint(-40, 40)
         drawer.goto(stump_x, totalHeight / 10 * 2)
