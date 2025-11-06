@@ -1,57 +1,106 @@
-import pygame
-pygame.init()
+#!/usr/bin/env python3
+"""
+main_turtle.py - 8 klickbare Bits mit turtle (kein pygame)
 
-# Fenster auf volle Bildschirmgrösse (nicht Vollbild)
-info = pygame.display.Info()
-screen = pygame.display.set_mode((info.current_w, info.current_h))
-pygame.display.set_caption("Binärsystem-Visualisierung")
+- Acht große 0/1 horizontal zentriert
+- Unter jeder Ziffer eine kurze senkrechte Linie (Stummel)
+- Klick auf eine Ziffer toggelt das Bit (0 <-> 1) und aktualisiert "Dezimalwert:"
+- Start: python main_turtle.py
+"""
+import turtle
 
-# Schrift definieren
-font = pygame.font.SysFont(None, 100)
-small_font = pygame.font.SysFont(None, 60)
+# --- Konfiguration ---
+N_BITS = 8
+WINDOW_W, WINDOW_H = 1200, 420
+TITLE_Y = 160
+DIGIT_Y = 0
+DIGIT_FONT = ("Arial", 72, "bold")    # große Ziffern
+TITLE_FONT = ("Arial", 36, "bold")
+STUMP_LEN = 18
+STUMP_WIDTH = 6
+DIGIT_HIT_W = 110    # Hitbox-Breite um die Ziffer
+DIGIT_HIT_H = 120    # Hitbox-Höhe um die Ziffer
+BG_COLOR = "white"
+DIGIT_COLOR = "black"
+STUMP_COLOR = "black"
 
-# Startzustand: 8 Bits auf 0
-bits = [0] * 8
+# --- Setup ---
+screen = turtle.Screen()
+screen.setup(WINDOW_W, WINDOW_H)
+screen.title("Bits - Klick zum Umschalten")
+screen.bgcolor(BG_COLOR)
+screen.tracer(0)  # manuelles update für sauberes Redraw
 
-# Position der Bits berechnen
-bit_spacing = 120
-start_x = (info.current_w - bit_spacing * 7) // 2
-y_pos = info.current_h // 2
+drawer = turtle.Turtle(visible=False)
+drawer.penup()
+drawer.speed(0)
 
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+# initial bits (alle 0)
+bits = [0] * N_BITS
 
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-            mouse_x, mouse_y = event.pos
-            # prüfen, ob auf eine Zahl geklickt wurde
-            for i in range(8):
-                x = start_x + i * bit_spacing
-                bit_rect = pygame.Rect(x - 40, y_pos - 60, 80, 120)
-                if bit_rect.collidepoint(mouse_x, mouse_y):
-                    bits[i] = 1 - bits[i]  # zwischen 0 und 1 wechseln
+# berechne x-positionen zentriert
+total_width = WINDOW_W * 0.75  # belegter Bereich für die Bits
+start_x = - total_width / 2
+if N_BITS > 1:
+    spacing = total_width / (N_BITS - 1)
+else:
+    spacing = 0
+bit_positions = [start_x + i * spacing for i in range(N_BITS)]
 
-    # Hintergrund weiss
-    screen.fill((255, 255, 255))
 
-    # Dezimalwert berechnen
-    bit_string = "".join(str(b) for b in bits)
-    decimal_value = int(bit_string, 2)
+def bits_to_decimal(b):
+    # b[0] ist MSB (links)
+    val = 0
+    n = len(b)
+    for i, bit in enumerate(b):
+        val += bit << (n - 1 - i)
+    return val
 
-    # Dezimalwert anzeigen
-    text_surface = small_font.render(f"Dezimalwert: {decimal_value}", True, (0, 0, 0))
-    text_rect = text_surface.get_rect(center=(info.current_w // 2, y_pos - 150))
-    screen.blit(text_surface, text_rect)
 
-    # Bits anzeigen
-    for i, bit in enumerate(bits):
-        x = start_x + i * bit_spacing
-        bit_surface = font.render(str(bit), True, (0, 0, 0))
-        bit_rect = bit_surface.get_rect(center=(x, y_pos))
-        screen.blit(bit_surface, bit_rect)
+def draw_all():
+    drawer.clear()
+    # Titel
+    drawer.goto(0, TITLE_Y)
+    drawer.pencolor(DIGIT_COLOR)
+    drawer.write(f"Dezimalwert: {bits_to_decimal(bits)}", align="center", font=TITLE_FONT)
 
-    pygame.display.flip()
+    # Zeichne Ziffern und Stummel
+    for i, x in enumerate(bit_positions):
+        y = DIGIT_Y
+        # Ziffer
+        drawer.goto(x, y - (DIGIT_FONT[1] // 3))  # leicht zentriert, weil write an der Basis ausrichtet
+        drawer.pencolor(DIGIT_COLOR)
+        drawer.write(str(bits[i]), align="center", font=DIGIT_FONT)
 
-pygame.quit()
+        # Stummel unter der Ziffer
+        stump_x = x
+        # stump_y_top: etwas unterhalb der Ziffer; experimentell abgeschätzt
+        stump_y_top = y - (DIGIT_FONT[1] // 1.6)
+        drawer.pensize(STUMP_WIDTH)
+        drawer.pencolor(STUMP_COLOR)
+        drawer.goto(stump_x, stump_y_top)
+        drawer.pendown()
+        drawer.goto(stump_x, stump_y_top - STUMP_LEN)
+        drawer.penup()
+        drawer.pensize(1)
+
+    screen.update()
+
+
+def on_click(x, y):
+    # prüfe ob Klick in einer Ziffer-Hitbox ist; toggele erstes Treffer-Bit
+    for i, bx in enumerate(bit_positions):
+        if abs(x - bx) <= DIGIT_HIT_W / 2 and abs(y - DIGIT_Y) <= DIGIT_HIT_H / 2:
+            bits[i] ^= 1
+            draw_all()
+            break
+
+
+# Zeichne das erste Mal
+draw_all()
+
+# Event-Bindung
+screen.onclick(on_click)
+
+# Keep window open
+turtle.done()
