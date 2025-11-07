@@ -68,9 +68,33 @@ def bits_to_decimal(b):
 def draw_all():
     drawer.clear()
     # Titel
+    # --- Hintergrundbox für Dezimalwert ---
     drawer.goto(0, TITLE_Y)
-    drawer.pencolor(DIGIT_COLOR)
-    drawer.write(f"Dezimalwert: {bits_to_decimal(bits)}", align="center", font=TITLE_FONT)
+
+    # Grösse der Box (breite an Text angepasst)
+    box_width = 450
+    box_height = 60
+
+    # Rechteck zeichnen
+    drawer.penup()
+    drawer.goto(-box_width / 2 - 10, TITLE_Y + 10)  # oben links der Box
+    drawer.pendown()
+    drawer.pencolor("black")
+    drawer.fillcolor("#017944")
+    drawer.pensize(5)
+    drawer.begin_fill()
+    for _ in range(2):
+        drawer.forward(box_width)
+        drawer.right(90)
+        drawer.forward(box_height)
+        drawer.right(90)
+    drawer.end_fill()
+    drawer.penup()
+
+    # Text darüber schreiben
+    drawer.goto(0, TITLE_Y - box_height / 2 - 5)
+    drawer.pencolor("black")
+    drawer.write(f"Dezimalwert:{bits_to_decimal(bits)}", align="center", font=TITLE_FONT)
 
     # Zeichne Ziffern und Stummel
     for i, x in enumerate(bit_positions):
