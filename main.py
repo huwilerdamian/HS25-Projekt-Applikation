@@ -21,7 +21,6 @@ STUMP_WIDTH = 14
 DIGIT_HIT_W = 110    # Hitbox-Breite um die Ziffer
 DIGIT_HIT_H = 120    # Hitbox-Höhe um die Ziffer
 BG_COLOR = "black"
-DIGIT_COLOR = "white"
 STUMP_COLOR_ACTIVE = "#fca139"
 STUMP_COLOR_INACTIVE = "#a68046"
 
