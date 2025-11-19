@@ -56,6 +56,7 @@ bit_positions = [start_x + i * spacing for i in range(N_BITS)]
 
 # mit Spielmodus erweitern
 playmode = False
+randomDecimal = None
 
 # Spielmodus-Button Position und Groesse
 BTN_X1, BTN_Y1 = WINDOW_W/2 - 240, WINDOW_H/2 - 40   # oben links
@@ -100,7 +101,13 @@ def draw_all():
     # Text darüber schreiben
     drawer.goto(0, TITLE_Y - box_height / 2 - 5)
     drawer.pencolor("black")
-    drawer.write(f"Dezimalwert:{bits_to_decimal(bits)}", align="center", font=TITLE_FONT)
+    if playmode:
+        if bits_to_decimal(bits) == randomDecimal:
+            drawer.pencolor("red")
+            screen.ontimer(regenerate_random, 2000)
+        drawer.write(f"Dezimalwert:{randomDecimal}", align="center", font=TITLE_FONT)
+    else:
+        drawer.write(f"Dezimalwert:{bits_to_decimal(bits)}", align="center", font=TITLE_FONT)
 
     # Zeichne Ziffern und Stummel
     for i, x in enumerate(bit_positions):
@@ -163,10 +170,15 @@ def draw_all():
 def on_click(x, y):
 
     # prüfe ob Klick auf Spielmodus Button
-    global playmode
+    global playmode, randomDecimal
 
     if BTN_X1 <= x <= BTN_X2 and BTN_Y2 <= y <= BTN_Y1:
-        playmode = True
+        if not playmode:  # nur beim Wechsel
+            playmode = True
+            randomDecimal = random.randint(0, 255)
+        else:
+            playmode = False
+            randomDecimal = None
         draw_all()
         return
 
@@ -177,6 +189,11 @@ def on_click(x, y):
             draw_all()
             break
 
+#RandomDecimal neu berechnen, falls Zahl gefunden wurde
+def regenerate_random():
+    global randomDecimal
+    randomDecimal = random.randint(0, 255)
+    draw_all()
 
 # Zeichne das erste Mal
 draw_all()
