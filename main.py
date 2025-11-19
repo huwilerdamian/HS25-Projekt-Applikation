@@ -114,7 +114,7 @@ def draw_all():
         drawer.write(f"Dezimalwert:{randomDecimal}", align="center", font=TITLE_FONT)
         # Wenn Animation aktiv → „RICHTIG!“ anzeigen
         if is_celebrating:
-            drawer.goto(0, TITLE_Y + 80)
+            drawer.goto(0, TITLE_Y + 40)
             drawer.pencolor("yellow")
             drawer.write("RICHTIG!", align="center", font=("Arial", 48, "bold"))
     else:
