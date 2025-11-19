@@ -12,7 +12,7 @@ import random
 
 # --- Konfiguration ---
 N_BITS = 8
-WINDOW_W, WINDOW_H = 1200, 900
+WINDOW_W, WINDOW_H = 1000, 600
 TITLE_Y = 160
 DIGIT_Y = 0
 DIGIT_FONT = ("Arial", 72, "bold")    # große Ziffern
