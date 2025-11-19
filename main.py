@@ -55,6 +55,13 @@ else:
     spacing = 0
 bit_positions = [start_x + i * spacing for i in range(N_BITS)]
 
+# mit Spielmodus erweitern
+playmode = False
+
+# Spielmodus-Button Position und Groesse
+BTN_X1, BTN_Y1 = WINDOW_W/2 - 240, WINDOW_H/2 - 40   # oben links
+BTN_X2, BTN_Y2 = WINDOW_W/2 - 40, WINDOW_H/2 - 100     # unten rechts
+
 
 def bits_to_decimal(b):
     # b[0] ist MSB (links)
@@ -128,10 +135,42 @@ def draw_all():
         drawer.penup()
         drawer.pensize(1)
 
+        # --- Spielmodus-Button ---
+        drawer.goto(BTN_X1, BTN_Y1)
+        drawer.pendown()
+
+        if playmode:
+            drawer.fillcolor("#248f24")  # grün wenn aktiv
+        else:
+            drawer.fillcolor("#555555")  # grau wenn inaktiv
+
+        drawer.begin_fill()
+        for _ in range(2):
+            drawer.forward(BTN_X2 - BTN_X1)
+            drawer.right(90)
+            drawer.forward(BTN_Y1 - BTN_Y2)
+            drawer.right(90)
+        drawer.end_fill()
+        drawer.penup()
+
+        # Text
+        drawer.goto((BTN_X1 + BTN_X2) / 2, (BTN_Y1 + BTN_Y2) / 2 - 10)
+        drawer.pencolor("white")
+        drawer.write("Spielmodus", align="center", font=("Arial", 20, "bold"))
+
     screen.update()
 
 
 def on_click(x, y):
+
+    # prüfe ob Klick auf Spielmodus Button
+    global playmode
+
+    if BTN_X1 <= x <= BTN_X2 and BTN_Y2 <= y <= BTN_Y1:
+        playmode = True
+        draw_all()
+        return
+
     # prüfe ob Klick in einer Ziffer-Hitbox ist; toggele erstes Treffer-Bit
     for i, bx in enumerate(bit_positions):
         if abs(x - bx) <= DIGIT_HIT_W / 2 and abs(y - DIGIT_Y) <= DIGIT_HIT_H / 2:
