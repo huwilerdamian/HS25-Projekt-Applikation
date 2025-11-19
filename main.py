@@ -57,6 +57,10 @@ bit_positions = [start_x + i * spacing for i in range(N_BITS)]
 # mit Spielmodus erweitern
 playmode = False
 randomDecimal = None
+# Sieges-Animation
+is_celebrating = False
+celebration_time = 0
+confetti = []
 
 # Spielmodus-Button Position und Groesse
 BTN_X1, BTN_Y1 = WINDOW_W/2 - 240, WINDOW_H/2 - 40   # oben links
@@ -73,6 +77,7 @@ def bits_to_decimal(b):
 
 
 def draw_all():
+    global is_celebrating, celebration_time, confetti
     drawer.clear()
     # Titel
     # --- Hintergrundbox für Dezimalwert ---
@@ -102,13 +107,19 @@ def draw_all():
     drawer.goto(0, TITLE_Y - box_height / 2 - 5)
     drawer.pencolor("black")
     if playmode:
-        if bits_to_decimal(bits) == randomDecimal:
-            drawer.pencolor("red")
-            screen.ontimer(regenerate_random, 2000)
+        # Wenn richtige Zahl, Animation starten (nur einmal)
+        if bits_to_decimal(bits) == randomDecimal and not is_celebrating:
+            start_celebration()
+        drawer.pencolor("black")
         drawer.write(f"Dezimalwert:{randomDecimal}", align="center", font=TITLE_FONT)
+        # Wenn Animation aktiv → „RICHTIG!“ anzeigen
+        if is_celebrating:
+            drawer.goto(0, TITLE_Y + 80)
+            drawer.pencolor("yellow")
+            drawer.write("RICHTIG!", align="center", font=("Arial", 48, "bold"))
     else:
+        # Normaler Modus: immer aktuellen Dezimalwert der eingestellten Bits anzeigen
         drawer.write(f"Dezimalwert:{bits_to_decimal(bits)}", align="center", font=TITLE_FONT)
-
     # Zeichne Ziffern und Stummel
     for i, x in enumerate(bit_positions):
         y = DIGIT_Y
@@ -163,7 +174,15 @@ def draw_all():
         drawer.goto((BTN_X1 + BTN_X2) / 2, (BTN_Y1 + BTN_Y2) / 2 - 10)
         drawer.pencolor("white")
         drawer.write("Spielmodus", align="center", font=("Arial", 20, "bold"))
-
+    # Konfettiregen zeichnen
+    if is_celebrating:
+        drawer.pensize(4)
+        for c in confetti:
+            drawer.goto(c["x"], c["y"])
+            drawer.pencolor(c["color"])
+            drawer.pendown()
+            drawer.dot(10)
+            drawer.penup()
     screen.update()
 
 
@@ -188,7 +207,47 @@ def on_click(x, y):
             bits[i] ^= 1
             draw_all()
             break
+def start_celebration():
+    """Start der 4-Sekunden-Siegesanimation."""
+    global is_celebrating, celebration_time, confetti
 
+    is_celebrating = True
+    celebration_time = 0
+
+    # Konfetti erzeugen (zufällige Startpositionen oben)
+    confetti = []
+    colors = ["red", "yellow", "green", "cyan", "magenta", "orange", "white"]
+    for _ in range(80):
+        confetti.append({
+            "x": random.randint(-WINDOW_W // 2 + 50, WINDOW_W // 2 - 50),
+            "y": random.randint(WINDOW_H // 2 - 50, WINDOW_H // 2 + 200),
+            "dy": random.uniform(-8, -3),  # Fallgeschwindigkeit
+            "color": random.choice(colors)
+        })
+
+    celebration_step()
+
+
+def celebration_step():
+    """Konfetti fallen lassen & Animation beenden."""
+    global celebration_time, is_celebrating, confetti
+
+    if not is_celebrating:
+        return
+
+    # Konfetti bewegen
+    for c in confetti:
+        c["y"] += c["dy"]
+
+    # Nach 4 Sekunden Animation beenden
+    celebration_time += 0.1
+    if celebration_time >= 4:
+        is_celebrating = False
+        regenerate_random()
+        return
+
+    draw_all()
+    screen.ontimer(celebration_step, 100)  # alle 100 ms
 #RandomDecimal neu berechnen, falls Zahl gefunden wurde
 def regenerate_random():
     global randomDecimal
